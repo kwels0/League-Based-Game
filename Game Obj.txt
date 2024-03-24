@@ -1,0 +1,32 @@
+LeagueBased Game
+Inherit regular stats
+
+Methods for Scenarios
+and switch case
+
+Characters
+Warrior: Mord 
+Archer: Jhin
+Mage: Fiddlesticks
+Beast: Warwick
+Void: Cho'gath
+
+Picking of Characters will be
+Where they from regions
+
+Scenes: 
+Shadow Isles: Boss Viego
+Ionia: Boss 
+Void: Belveth
+Zaun: Boss Vi
+Bandle City: Demons Boss Devil Teemo
+
+
+Goal:
+Enenemies
+Turns with round counts
+Skills
+
+
+
+

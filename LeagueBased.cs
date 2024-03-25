@@ -74,8 +74,8 @@ Exp: {Exp}", 1);
             string description = "Twice slain and thrice born, Mordekaiser is a brutal warlord from a foregone epoch, who uses his necromantic sorcery to bind souls into an eternity of servitude. Few now remain who remember his earlier conquests, or know the true extent of his powers—but there are some ancient souls that do, and they fear the day when he may return to claim dominion over both the living and the dead.", 
             double hp = 645, 
             int maxHP= 645, 
-            double dmg = 61, 
-            int stamina = 150, 
+            double dmg = 60, 
+            int stamina = 100, 
             int spd = 35)
         : base(name, job, description, hp, maxHP, dmg, spd)
         {
@@ -87,7 +87,7 @@ Exp: {Exp}", 1);
             Console.WriteLine("Stamina: " + Stamina);
         }
 
-        public static void SkillUse(enemyStats enemyStats)
+        public void SkillUse(enemyStats enemy)
         {
             delay(@"
 [1] Obliterate
@@ -100,59 +100,67 @@ Exp: {Exp}", 1);
             {
                 case '1':
                 {
-                    Obliterate(ShadowIsles);
+                    Obliterate(enemy);
                     return;
                 }
                 case '2':
                 {
-                    Indestructible(ChampionStats);
+                    Indestructible(enemy);
                     return;
                 }
                 case '3':
                 {
-                    DeathsGrasp(ShadowIsles);
+                    DeathsGrasp(enemy);
                     return;
                 }
                 case '4':
                 {
-                    RealmofDeath(ChampionStats);
+                    RealmofDeath(enemy);
                     return;
                 }
             }
         }
-        public void Obliterate(enemyStats enemyStats)
+        public int Obliterate(enemyStats enemy)
         {
             if (Stamina >= 25)
             {
-                double damage = ChampionStats.Dmg * 0.20;
-                enemyStats.Hp -= damage;
-                Stamina -= 25;
+                double damage = Dmg * 0.20;
+                enemy.Hp -= damage; 
+                int stam = 25;
+                Stamina -= stam;
                 Console.WriteLine($"You used Obliterate and dealt {damage} damage!");
+                return Stamina; 
             }
             else
             {
                 delay($"You do not have enough stamina to use Obliterate!",1);
-            }  
+                return Stamina; 
+            }
         }
-        public void Indestructible(enemyStats enemyStats)
+
+        public void Indestructible(enemyStats enemy)
         {
             if (Stamina >= 25)
             {
                 double healAmount = Hp * 0.05;
                 Hp += healAmount;
+                if (Hp > MaxHP) 
+                {
+                    Hp = MaxHP;
+                }
                 Stamina -= 25;
                 Console.WriteLine($"You have healed for {healAmount}!");
             }
             else
             {
-                delay($"You do not have enough stamina to use Indestructable!",1);
+                delay($"You do not have enough stamina to use Indestructable!", 1);
             } 
         }
-        public void DeathsGrasp(enemyStats enemyStats)
+        public void DeathsGrasp(enemyStats enemy)
         {
             if (Stamina >= 25)
             {
-                enemyStats.Spd -= 10;
+                //enemyStats.Spd -= 10;
                 Stamina -= 25;
                 Console.WriteLine("You have slowed down the enemy by 10 spd!");
             }
@@ -161,7 +169,7 @@ Exp: {Exp}", 1);
                 delay($"You do not have enough stamina to use Death's Grasp!",1);
             } 
         }
-        public void RealmofDeath(enemyStats enemyStats)
+        public void RealmofDeath(enemyStats enemy)
         {
             if (Stamina >= 50)
             {
@@ -175,6 +183,14 @@ Exp: {Exp}", 1);
             {
                 delay($"You do not have enough stamina to use Realm of Death!",1);
             }
+        }
+    }
+
+    public class MordCreate
+    {
+        public static Mordekaiser CreateMordekaiser()
+        {
+            return new Mordekaiser();
         }
     }
 
@@ -329,7 +345,7 @@ Exp: {Exp}", 1);
     {
         public string Name;
         public string Description;
-        public int Hp; 
+        public double Hp; 
         public int Dmg; 
         public int Stamina; 
         public int Spd; 
@@ -484,46 +500,63 @@ Confirm selected champion?
     }
     public class ShadowIsles
     {
-        public class spectralIronhound : enemyStats
+        public class Enemy : enemyStats
+        {
+            public Enemy(string name, string description, int hp, int dmg, int spd, int stamina)
+                : base(name, description, hp, dmg, spd, stamina, 100)
+            {
+            }
+        }
+
+        public class spectralIronhound : Enemy
         {
             public spectralIronhound()
-            : base("Spectral Ironhound", "A spectral hound from the Shadow Isles.", 100, 20, 100, 30, 1)
+                : base("Spectral Ironhound", "A spectral hound from the Shadow Isles.", 100, 20, 30, 1)
             {
             }
         }
-        public class Thousand_Clawed_Deathwinder : enemyStats
+
+        public class Thousand_Clawed_Deathwinder : Enemy
         {
             public Thousand_Clawed_Deathwinder()
-            : base("Thousand-Clawed Deathwinder", "A deadly serpent with a thousand claws.", 150, 40, 100, 40, 1)
+                : base("Thousand-Clawed Deathwinder", "A deadly serpent with a thousand claws.", 150, 40, 40, 1)
             {
             }
         }
-        public class Erastin_the_Disgraced : enemyStats
+
+        public class Erastin_the_Disgraced : Enemy
         {
             public Erastin_the_Disgraced()
-            : base("Erastin the Disgraced", "A fallen knight seeking redemption.", 200, 50, 100, 35, 1)
+                : base("Erastin the Disgraced", "A fallen knight seeking redemption.", 200, 50, 35, 1)
             {
             }
         }
-        public class Commander_Ledros : enemyStats
+
+        public class Commander_Ledros : Enemy
         {
             public Commander_Ledros()
-            : base("Commander Ledros", "A fearsome undead commander.", 400, 70, 100, 40, 1)
+                : base("Commander Ledros", "A fearsome undead commander.", 400, 70, 40, 1)
             {
             }
         }
-        public class Viego : enemyStats
+
+        public class Viego : Enemy
         {
             public Viego()
-            : base("Viego", "The Ruined King, seeking to reclaim his lost queen.", 800, 90, 100, 50, 1)
+                : base("Viego", "The Ruined King, seeking to reclaim his lost queen.", 800, 90, 50, 1)
             {
             }
         }
     }
 
-    public void ShadowIslesEnemy()
+
+    public static void ShadowIslesEnemy()
     {
-        
+        ShadowIsles.spectralIronhound spectralIronhound = new ShadowIsles.spectralIronhound();
+        ShadowIsles.Thousand_Clawed_Deathwinder deathwinder = new ShadowIsles.Thousand_Clawed_Deathwinder();
+        ShadowIsles.Erastin_the_Disgraced disgraced = new ShadowIsles.Erastin_the_Disgraced();
+        ShadowIsles.Commander_Ledros ledros = new ShadowIsles.Commander_Ledros();
+        ShadowIsles.Viego viego = new ShadowIsles.Viego();
     }
 
     public class Ionia
@@ -684,12 +717,6 @@ Confirm selected champion?
 
     public static void ShadowIslesRoute()
     {   
-        ShadowIsles.Thousand_Clawed_Deathwinder thousand_Clawed_Deathwinder = new ShadowIsles.Thousand_Clawed_Deathwinder();
-        ShadowIsles.Erastin_the_Disgraced erastin_the_Disgraced = new ShadowIsles.Erastin_the_Disgraced();
-        ShadowIsles.Commander_Ledros commander_Ledros = new ShadowIsles.Commander_Ledros();
-        ShadowIsles.Viego viego = new ShadowIsles.Viego();
-
-        //Mordekaiser mordekaiser = new Mordekaiser();
         Console.WriteLine(@"
  .--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--. 
 / .. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \
@@ -717,7 +744,7 @@ Confirm selected champion?
  `--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--' ");
         delay("The land now known as the Shadow Isles was once a Blessed Isles Crest icon beautiful realm, but it was shattered by a magical cataclysm. Black Mist permanently shrouds the isles and the land itself is tainted, corrupted by malevolent sorcery sorcery. Living beings that stand upon the Shadow Isles slowly have their life-force leeched from them, which, in turn, draws the insatiable, predatory spirits of the dead. Those who perish within the Black Mist are condemned to haunt this melancholy land for eternity. Worse, the power of the Shadow Isles is waxing stronger with every passing year, allowing the shades of undeath to extend their range and reap souls all across Runeterra.",1);
         keyRead();
-        Mordekaiser mordekaiser = new Mordekaiser();
+        Mordekaiser mordekaiser = MordCreate.CreateMordekaiser();
         ShadowIsles.spectralIronhound spectralIronhound = new ShadowIsles.spectralIronhound();
         Console.WriteLine("You encountered an enemy! Prepare for battle!");
         BattleLogic(mordekaiser, spectralIronhound);
@@ -1021,7 +1048,7 @@ class theMap
     }
     static void BattleInitiationR1()
     {
-        Mordekaiser mordekaiser = new Mordekaiser();
+        Mordekaiser mordekaiser = MordCreate.CreateMordekaiser();
         ShadowIsles.spectralIronhound spectralIronhound = new ShadowIsles.spectralIronhound();
         Console.WriteLine("You encountered an enemy! Prepare for battle!");
         //BatlleLogic(mordekaiser, spectralIronhound);
@@ -1053,9 +1080,17 @@ class theMap
         while (playerAlive && enemyAlive)
         {
             Console.WriteLine($"\n--- Round {round} ---");
-            // Player's turn
-            PlayerTurn(playerChampionStats, enemyStats);
-            Mordekaiser.SkillUse(ChampionStats);
+            Mordekaiser mordekaiser = MordCreate.CreateMordekaiser();
+            Console.WriteLine($"Stamina: {mordekaiser.Stamina}"); 
+            if (mordekaiser.Stamina <= 0)
+            {
+                Console.WriteLine("You do not have enough stamina to take action. Skipping turn...");
+            }
+            else
+            {
+                PlayerTurn(playerChampionStats, enemyStats); // Instantiate Mordekaiser
+                mordekaiser.SkillUse(enemyStats);
+            }
 
             if (enemyStats.Hp <= 0)
             {

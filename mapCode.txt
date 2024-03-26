@@ -1,0 +1,227 @@
+nde na idadagdag
+class theMap
+{
+    // Color constants
+    const ConsoleColor PlayerColor = ConsoleColor.Black;
+    const ConsoleColor EnemyColor1 = ConsoleColor.Green;
+    const ConsoleColor EnemyColor2 = ConsoleColor.Blue;
+    const ConsoleColor EnemyColor3 = ConsoleColor.Yellow;
+    const ConsoleColor EnemyColor4 = ConsoleColor.Magenta;
+    const ConsoleColor EnemyColorB = ConsoleColor.Red;
+    const ConsoleColor DefaultColor = ConsoleColor.White;
+
+    public static void MapBattle()
+    {
+        int mapWidth = 20; 
+        int mapHeight = 10; 
+
+        char[,] map = new char[mapHeight, mapWidth]; 
+        bool[,] visible = new bool[mapHeight, mapWidth]; 
+        int[,] enemyPositions = new int[2, 3]; 
+
+        InitializeMap(map, visible, enemyPositions);
+
+        int playerX = 0;
+        int playerY = 0;
+        map[playerY, playerX] = 'P';
+
+        visible[playerY, playerX] = true;
+
+        DisplayMap(map, visible);
+
+        while (true)
+        {
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.W:
+                    MovePlayer(map, visible, enemyPositions, ref playerX, ref playerY, 0, -1); 
+                    break;
+                case ConsoleKey.S:
+                    MovePlayer(map, visible, enemyPositions, ref playerX, ref playerY, 0, 1); 
+                    break;
+                case ConsoleKey.D:
+                    MovePlayer(map, visible, enemyPositions, ref playerX, ref playerY, 1, 0); 
+                    break;
+                case ConsoleKey.A:
+                    MovePlayer(map, visible, enemyPositions, ref playerX, ref playerY, -1, 0); 
+                    break;
+            }
+            ClearConsole();
+
+            DisplayMap(map, visible);
+        }
+    }
+
+    static void ClearConsole()
+    {
+        Console.SetCursorPosition(0, 0);
+        for (int i = 0; i < Console.WindowHeight; i++)
+        {
+            Console.WriteLine(new string(' ', Console.WindowWidth));
+        }
+        Console.SetCursorPosition(0, 0);
+    }
+    static void InitializeMap(char[,] map, bool[,] visible, int[,] enemyPositions)
+    {
+        Random rand = new Random();
+
+        for (int y = 0; y < map.GetLength(0); y++)
+        {
+            for (int x = 0; x < map.GetLength(1); x++)
+            {
+                visible[y, x] = false;
+                map[y, x] = '.';
+            }
+        }
+
+        for (int i = 0; i < enemyPositions.GetLength(0); i++)
+        {
+            int enemyX = rand.Next(0, map.GetLength(1));
+            int enemyY = rand.Next(0, map.GetLength(0));
+
+            while (map[enemyY, enemyX] != '.')
+            {
+                enemyX = rand.Next(0, map.GetLength(1));
+                enemyY = rand.Next(0, map.GetLength(0));
+            }
+
+            map[enemyY, enemyX] = 'E'; 
+            enemyPositions[i, 0] = enemyX;
+            enemyPositions[i, 1] = enemyY;
+        }
+    }
+
+    static void DisplayMap(char[,] map, bool[,] visible)
+    {
+        Console.WriteLine("╔" + new string('═', map.GetLength(1) * 2) + "╗");
+
+        for (int y = 0; y < map.GetLength(0); y++)
+        {
+            Console.Write("║");
+
+            for (int x = 0; x < map.GetLength(1); x++)
+            {
+                if (visible[y, x])
+                {
+                    if (map[y, x] == 'P')
+                        Console.ForegroundColor = PlayerColor;
+                    else if (map[y, x] == 'E')
+                        Console.ForegroundColor = EnemyColor2;
+
+                    Console.Write(map[y, x] + " "); 
+
+                    Console.ForegroundColor = DefaultColor;
+                }
+                else if (visible[y, x])
+                {
+                    if (map[y, x] == 'P')
+                        Console.ForegroundColor = PlayerColor;
+                    else if (map[y, x] == 'E')
+                        Console.ForegroundColor = EnemyColor1;
+
+                    Console.Write(map[y, x] + " "); 
+
+                    Console.ForegroundColor = DefaultColor;
+                }
+                else if (visible[y, x])
+                {
+                    if (map[y, x] == 'P')
+                        Console.ForegroundColor = PlayerColor;
+                    else if (map[y, x] == 'E')
+                        Console.ForegroundColor = EnemyColor3;
+
+                    Console.Write(map[y, x] + " "); 
+
+                    Console.ForegroundColor = DefaultColor;
+                }
+                else if (visible[y, x])
+                {
+                    if (map[y, x] == 'P')
+                        Console.ForegroundColor = PlayerColor;
+                    else if (map[y, x] == 'E')
+                        Console.ForegroundColor = EnemyColor4;
+
+                    Console.Write(map[y, x] + " "); 
+
+                    Console.ForegroundColor = DefaultColor;
+                }
+                else if (visible[y, x])
+                {
+                    if (map[y, x] == 'P')
+                        Console.ForegroundColor = PlayerColor;
+                    else if (map[y, x] == 'E')
+                        Console.ForegroundColor = EnemyColorB;
+
+                    Console.Write(map[y, x] + " "); 
+
+                    Console.ForegroundColor = DefaultColor;
+                }
+                else
+                {
+                    Console.Write(". "); 
+                }
+            }
+
+            Console.WriteLine("║");
+        }
+
+        Console.WriteLine("╚" + new string('═', map.GetLength(1) * 2) + "╝"); 
+
+        Console.WriteLine("\nUse WASD keys to move (W - up, A - left, S - down, D - right)");
+    }
+
+    static void MovePlayer(char[,] map, bool[,] visible, int[,] enemyPositions, ref int playerX, ref int playerY, int dx, int dy)
+    {
+        int newPlayerX = playerX + dx;
+        int newPlayerY = playerY + dy;
+
+        if (newPlayerX >= 0 && newPlayerX < map.GetLength(1) &&
+            newPlayerY >= 0 && newPlayerY < map.GetLength(0))
+        {
+            if (map[newPlayerY, newPlayerX] != 'X')
+            {
+                map[playerY, playerX] = '.';
+                playerX = newPlayerX;
+                playerY = newPlayerY;
+                MarkVisible(map, visible, playerX, playerY);
+                map[playerY, playerX] = 'P'; 
+                
+                if (map[playerY, playerX] == 'E')
+                {
+                    int enemyX = enemyPositions[0, 0]; 
+                    int enemyY = enemyPositions[0, 1]; 
+                    
+                    if ((Math.Abs(playerX - enemyX) == 1 && playerY == enemyY) || 
+                        (Math.Abs(playerY - enemyY) == 1 && playerX == enemyX))
+                    {
+                        BattleInitiationR1();
+                    }
+                }
+            }
+        }
+    }
+    static void BattleInitiationR1()
+    {
+        Mordekaiser mordekaiser = MordCreate.CreateMordekaiser();
+        ShadowIsles.spectralIronhound spectralIronhound = new ShadowIsles.spectralIronhound();
+        Console.WriteLine("You encountered an enemy! Prepare for battle!");
+        //BatlleLogic(mordekaiser, spectralIronhound);
+    }
+
+
+    static void MarkVisible(char[,] map, bool[,] visible, int playerX, int playerY)
+    {
+        visible[playerY, playerX] = true;
+        MarkCellVisible(map, visible, playerX - 1, playerY);
+        MarkCellVisible(map, visible, playerX + 1, playerY); 
+        MarkCellVisible(map, visible, playerX, playerY - 1);
+        MarkCellVisible(map, visible, playerX, playerY + 1);
+    }
+    static void MarkCellVisible(char[,] map, bool[,] visible, int x, int y)
+    {
+        if (x >= 0 && x < map.GetLength(1) && y >= 0 && y < map.GetLength(0))
+            visible[y, x] = true;
+    }
+}
